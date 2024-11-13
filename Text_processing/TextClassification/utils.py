@@ -28,7 +28,7 @@ def cluster_emb(embeddings, labels, method='PCA'):
         pca = PCA(n_components=2)
         reduced_embeddings = pca.fit_transform(embeddings)
 
-        plt.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1], c=emotions, alpha=0.7)
+        plt.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1], c=labels, alpha=0.7)
         plt.show()
     elif method == 'tSNE':
         tsne = TSNE(n_components=2)
