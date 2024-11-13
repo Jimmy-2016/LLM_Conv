@@ -5,6 +5,7 @@ import torch.nn as nn
 from transformers import BertTokenizer, BertModel
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 
 def read_conversation(file_path):
@@ -24,7 +25,13 @@ def cluster_emb(embeddings, emotions, method='Kmeans'):
         pca = PCA(n_components=2)
         reduced_embeddings = pca.fit_transform(embeddings)
 
-        plt.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1], c=emotions, cmap='tab10', alpha=0.7)
+        plt.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1], c=emotions, alpha=0.7)
+        plt.show()
+    elif method == 'tSNE':
+        tsne = TSNE(n_components=2)
+        reduced_embeddings = tsne.fit_transform(embeddings)
+
+        plt.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1], c=emotions, alpha=0.7)
         plt.show()
     else:
         print('Undefined Method')
