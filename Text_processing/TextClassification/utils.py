@@ -3,7 +3,8 @@ from transformers import AutoModel, AutoTokenizer
 import torch
 import torch.nn as nn
 from sklearn.decomposition import PCA
-
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Sample dataset for text classification
 texts = [

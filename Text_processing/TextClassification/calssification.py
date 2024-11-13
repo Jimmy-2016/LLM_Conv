@@ -11,5 +11,7 @@ print('tokenized')
 
 inputs = tokenizer(texts, return_tensors="pt", padding=True, truncation=True)
 embeddings = model(**inputs).last_hidden_state.mean(dim=1)  # Get average embedding
+embeddings = embeddings.detach().numpy().squeeze()
+
 print('emebedding is ready')
 cluster_emb(embeddings, labels)
