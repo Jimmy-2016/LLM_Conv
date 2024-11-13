@@ -1,4 +1,5 @@
-from utils.py import *
+
+from utils import *
 
 # Load model and tokenizer
 model_name = "bert-base-uncased"  # 
