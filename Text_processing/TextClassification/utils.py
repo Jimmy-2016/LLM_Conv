@@ -5,6 +5,10 @@ import torch.nn as nn
 from sklearn.decomposition import PCA
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
+from peft import get_peft_model, LoraConfig
+from torch.utils.data import TensorDataset, DataLoader
+import torch.optim as optimizer
 
 # Sample dataset for text classification
 texts = [
@@ -38,3 +42,27 @@ def cluster_emb(embeddings, labels, method='PCA'):
         plt.show()
     else:
         print('Undefined Method')
+
+class myNNHead(nn.Module):
+    def __init__(self, n_hidden=30) -> None:
+        super().__init__()
+        self.fc = nn.Linear(in_features=768, out_features=n_hidden)
+        self.out = nn.Linear(in_features=n_hidden, out_features=3)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        x = self.relu(self.fc(x))
+
+        return self.out(x)
+
+class combine_nets(nn.Module):
+    def __init__(self, basemodel, headmodel) -> None:
+        super().__init__()
+        self.basemodel = basemodel
+        self.headmodel = headmodel
+
+    def forward(self, x):
+        x = self.basemodel(x)
+        x = x.last_hidden_state.mean(dim=1)
+
+        return self.headmodel(x)

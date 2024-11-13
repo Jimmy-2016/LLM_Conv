@@ -1,0 +1,64 @@
+
+from utils import *
+
+# Define LoRA configuration
+
+
+model_name = "bert-base-uncased"  # modelname
+model = AutoModel.from_pretrained(model_name)  # upload the model
+tokenizer = AutoTokenizer.from_pretrained(model_name) # upload the tokernizer
+
+# print(model)
+
+
+lora_config = LoraConfig(r=8, lora_alpha=32, target_modules=["query", "value"], lora_dropout=0.1)
+lora_model = get_peft_model(model, lora_config)
+
+inputs = tokenizer(texts, padding=True, truncation=True, return_tensors="pt")
+
+dataset = TensorDataset(inputs["input_ids"], inputs["attention_mask"], torch.tensor(labels))
+data_loader = DataLoader(dataset, batch_size=3)
+
+optim = optimizer.Adam(lora_model.parameters(), lr=1e-4)
+criteria = nn.CrossEntropyLoss()
+n_epoches = 10
+lora_model.train()
+
+head_model = myNNHead()
+head_model.train()
+
+combine_model = combine_nets(lora_model, head_model)
+combine_model.train()
+
+loss_data = []
+for ei in range(n_epoches):
+    print(ei)
+    for batch in data_loader:
+        input, mask, target = batch
+
+        # output = lora_model(input)
+        # logits = output.last_hidden_state.mean(dim=1)
+        # pred = head_model(logits)
+
+        pred = combine_model(input)
+
+        loss = criteria(pred, target)
+        loss_data.append(loss.item())
+
+        optim.zero_grad()
+        loss.backward()
+        optim.step()
+
+loss_data = np.array(loss_data)
+plt.figure()
+plt.plot(loss_data.reshape(-1, 10).mean(0), lw=4, c='b')
+plt.figure()
+plt.plot(loss_data)
+
+plt.show()
+        
+
+    
+
+
+
