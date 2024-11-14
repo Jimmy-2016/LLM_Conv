@@ -1,5 +1,5 @@
 
-from utils import *
+from Alignment.utils import *
 
 from datasets import load_dataset
 

@@ -19,7 +19,7 @@ inputs = tokenizer(texts, padding=True, truncation=True, return_tensors="pt")
 dataset = TensorDataset(inputs["input_ids"], inputs["attention_mask"], torch.tensor(labels))
 data_loader = DataLoader(dataset, batch_size=3)
 
-optim = optimizer.Adam(lora_model.parameters(), lr=1e-4)
+optim = optimizer.AdamW(lora_model.parameters(), lr=1e-4)
 criteria = nn.CrossEntropyLoss()
 n_epoches = 10
 lora_model.train()
