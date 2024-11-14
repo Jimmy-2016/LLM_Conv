@@ -23,7 +23,7 @@ dataset = PreferenceDataset(data=dataset, tokenizer=tokenizer)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=4, shuffle=True)
 
 num_epochs = 10
-lambda_ = 0.9
+lambda_ = 0.01
 optimizer = optim.AdamW(model.parameters(), lr=1e-4)
 training_loss = []
 # Training
@@ -46,10 +46,9 @@ for epoch in range(num_epochs):
         preference_loss = torch.relu(preference_loss).mean()
 
         # Control loss: KL divergence between original model and fine-tuned model for both outputs
-        control_loss = compute_loss_kl(input_ids, attention_mask, batch, output1, output2, original_model)
+        control_loss = compute_loss_kl(batch, output1, output2, original_model)
 
         combined_loss = preference_loss + lambda_ * control_loss
-
 
 
         # Backward pass
