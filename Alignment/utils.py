@@ -4,8 +4,8 @@ import torch
 import torch.optim as optim
 from peft import get_peft_model, LoraConfig, TaskType
 from copy import deepcopy
-import torch.functional as F
-
+import torch.nn.functional as F
+import matplotlib.pylab as plt
 
 
 dataset = [
@@ -56,11 +56,15 @@ def compute_loss(logits, target, attention_mask):
     shift_logits = logits[..., :-1, :].contiguous()
     shift_labels = target[..., 1:].contiguous()
     loss_fn = torch.nn.CrossEntropyLoss(reduction="none")
-    loss = loss_fn(shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1))
-    return (loss * attention_mask[..., 1:].float()).sum() / attention_mask[..., 1:].float().sum()
+    per_token_loss = loss_fn(shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1))
+
+    # Reshape to match (batch_size, sequence_length)
+    per_token_loss = per_token_loss.view(shift_labels.size())
+
+    return (per_token_loss * attention_mask[..., 1:].float()).sum() / attention_mask[..., 1:].float().sum()
 
 # Control Loss (KL)
-def compute_loss_kl(input_ids, attention_mask, batch, output1, output2, original_model):
+def compute_loss_kl(batch, output1, output2, original_model):
     with torch.no_grad():
         original_output1 = original_model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"])
         original_output2 = original_model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"])

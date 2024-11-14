@@ -22,7 +22,7 @@ model = get_peft_model(model, lora_config)
 dataset = PreferenceDataset(data=dataset, tokenizer=tokenizer)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=4, shuffle=True)
 
-num_epochs = 10
+num_epochs = 4
 lambda_ = 0.01
 optimizer = optim.AdamW(model.parameters(), lr=1e-4)
 training_loss = []
@@ -58,3 +58,6 @@ for epoch in range(num_epochs):
         training_loss.append(combined_loss.item())
 
     print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {total_loss / len(dataloader)}")
+
+plt.plot(training_loss, lw=4, c='b')
+plt.show()
