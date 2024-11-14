@@ -42,8 +42,10 @@ for epoch in range(num_epochs):
         loss2 = compute_loss(output2.logits, batch["response2"], batch["attention_mask"])
 
         # Compute preference loss: log-likelihood difference
-        preference_loss = (loss1 - loss2) * batch["preferred"].float() + (loss2 - loss1) * (1 - batch["preferred"].float())
-        preference_loss = torch.relu(preference_loss).mean()
+        
+        # preference_loss = (loss1 - loss2) * batch["preferred"].float() + (loss2 - loss1) * (1 - batch["preferred"].float())
+        # preference_loss = torch.relu(preference_loss).mean()
+        preference_loss = -F.logsigmoid(loss2 - loss1).mean()
 
         # Control loss: KL divergence between original model and fine-tuned model for both outputs
         control_loss = compute_loss_kl(batch, output1, output2, original_model)
